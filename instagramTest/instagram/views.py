@@ -7,7 +7,13 @@ import requests
 
 
 def login_user(request):
-    return render_to_response('loginpage.html')  # Create your views here.
+    context = dict()
+    context = {
+        'REDIRECT_URL': settings.REDIRECT_URL,
+        'CLIENT_ID': settings.CLIENT_ID,
+    
+    }
+    return render_to_response('loginpage.html',context)  # Create your views here.
 
 def validateUser(request):
     context = dict()

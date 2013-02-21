@@ -5,7 +5,8 @@ TEMPLATE_DEBUG = DEBUG
 import os.path
 PROJECT_DIR = os.path.dirname(__file__)
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
-SITE_ROOT_URI = 'http://127.0.0.1:8000/'
+SITE_ROOT_URI = 'http://stormy-hollows-1782.herokuapp.com/'
+REDIRECT_URL='http://stormy-hollows-1782.herokuapp.com/instagram/auth/'
 
 
 
@@ -62,7 +63,7 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = 'http://127.0.0.1:8000/media/'
+MEDIA_URL = 'http://stormy-hollows-1782.herokuapp.com/media/'
 
 
 # Absolute path to the directory static files should be collected to.
