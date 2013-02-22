@@ -6,10 +6,10 @@ import os.path
 PROJECT_DIR = os.path.dirname(__file__)
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-SITE_ROOT_URI='http://127.0.0.1:8000/'
-REDIRECT_URL='http://127.0.0.1:8000/instagram/auth/'
-#SITE_ROOT_URI = 'http://stormy-hollows-1782.herokuapp.com/'
-#REDIRECT_URL='http://stormy-hollows-1782.herokuapp.com/instagram/auth/'
+#SITE_ROOT_URI='http://127.0.0.1:8000/'
+#REDIRECT_URL='http://127.0.0.1:8000/instagram/auth/'
+SITE_ROOT_URI = 'http://stormy-hollows-1782.herokuapp.com/'
+REDIRECT_URL='http://stormy-hollows-1782.herokuapp.com/instagram/auth/'
 
 
 
@@ -185,9 +185,9 @@ try:
 except ImportError:
     pass
 # Parse database configuration from $DATABASE_URL
-#import dj_database_url
-#DATABASES['default'] =  dj_database_url.config()
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config()
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
