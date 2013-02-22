@@ -1,7 +1,10 @@
 from django.conf import settings
+from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.sessions.models import Session
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render, render_to_response
+from django.template.context import RequestContext
 import json
 import requests
 
@@ -13,7 +16,7 @@ def login_user(request):
         'CLIENT_ID': settings.CLIENT_ID,
     
     }
-    return render_to_response('loginpage.html',context)  # Create your views here.
+    return render_to_response('loginpage.html', context)  # Create your views here.
 
 def validateUser(request):
     context = dict()
@@ -30,14 +33,13 @@ def validateUser(request):
         })
 
         data = json.loads(r.text)
-        print data
         error = data.get('error_message', None)
 
         if not error:
             context['token'] = data['access_token']
             context['user_id'] = data['user'].get('id', None)
             context['user_name'] = data['user'].get('full_name', None)
-            request.session['accessToken']=data['access_token']
+            request.session['accessToken'] = data['access_token']
     
     
 
@@ -50,8 +52,9 @@ def validateUser(request):
 
 
 def instagram(request, userID):
+    print request.session.session_key
     context = dict()
-    user_r = requests.get('{0}users/{1}/?access_token={2}'.format(
+    user_r = requests.get('{0}users/{1}/?access_token={2}&max_id=3'.format(
         settings.INSTAGRAM_API_URL,
         userID,
         request.session['accessToken']))
@@ -69,5 +72,32 @@ def instagram(request, userID):
         'pagination': media_data.get('pagination', None),
     
     }
-    return render_to_response('instagram.html', context)
+    return render_to_response('instagram.html', context, context_instance=RequestContext(request))
+
+def instagramNext(request, userID, maxId):
+    session = SessionStore(session_key=request.session.session_key)
+    accessToken= session['accessToken']
+    print accessToken
+    context = dict()
+    user_r = requests.get('{0}users/{1}/?access_token={2}'.format(
+        settings.INSTAGRAM_API_URL,
+        userID,
+        accessToken))
+    user_data = json.loads(user_r.text)
+    print 'user data loaded'
+
+    media_r = requests.get('{0}users/{1}/media/recent/?access_token={2}&max_id={3}'.format(
+        settings.INSTAGRAM_API_URL,
+        userID,
+        accessToken,
+        maxId))
+    media_data = json.loads(media_r.text)
+    print 'media data loaded'
+    context = {
+        'user': user_data.get('data', None),
+        'media': media_data.get('data', None),
+        'pagination': media_data.get('pagination', None),
+    
+    }
+    return render_to_response('instagram.html', context, context_instance=RequestContext(request))
 

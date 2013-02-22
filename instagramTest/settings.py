@@ -1,12 +1,16 @@
 # Django settings for instagramTest project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 import os.path
 PROJECT_DIR = os.path.dirname(__file__)
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
-SITE_ROOT_URI = 'http://stormy-hollows-1782.herokuapp.com/'
-REDIRECT_URL='http://stormy-hollows-1782.herokuapp.com/instagram/auth/'
+if DEBUG:
+    SITE_ROOT_URI='http://127.0.0.1:8000/'
+    REDIRECT_URL='http://127.0.0.1:8000/instagram/auth/'
+else:
+    SITE_ROOT_URI = 'http://stormy-hollows-1782.herokuapp.com/'
+    REDIRECT_URL='http://stormy-hollows-1782.herokuapp.com/instagram/auth/'
 
 
 
@@ -24,7 +28,7 @@ REDIRECT_URI='http://127.0.0.1:8000/instagram/auth/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/Users/birusainju/Documents/Eclipse Testing Workspace/instagramTest/sqlite.db',  # Or path to database file if using sqlite3.
+        'NAME': os.path.join(PROJECT_DIR, 'sqlite.db'),  # Or path to database file if using sqlite3.
         'USER': '',  # Not used with sqlite3.
         'PASSWORD': '',  # Not used with sqlite3.
         'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
@@ -63,7 +67,7 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = 'http://stormy-hollows-1782.herokuapp.com/media/'
+MEDIA_URL = SITE_ROOT_URI + 'media/'
 
 
 # Absolute path to the directory static files should be collected to.
@@ -74,10 +78,11 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = SITE_ROOT_URI + 'static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
+    os.path.join(PROJECT_DIR, 'static'),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -123,6 +128,16 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.request',
+)
+SESSION_COOKIE_DOMAIN= '.test.com'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -170,11 +185,11 @@ try:
     from local_settings import *
 except ImportError:
     pass
+if not DEBUG:
+    # Parse database configuration from $DATABASE_URL
+    import dj_database_url
+    DATABASES['default'] =  dj_database_url.config()
 
-# Parse database configuration from $DATABASE_URL
-import dj_database_url
-DATABASES['default'] =  dj_database_url.config()
-
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # Honor the 'X-Forwarded-Proto' header for request.is_secure()
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

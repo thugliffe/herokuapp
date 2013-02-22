@@ -1,5 +1,7 @@
 from django.conf.urls import patterns, include, url
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic.base import RedirectView
+from instagramTest import settings
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -19,4 +21,9 @@ urlpatterns = patterns('',
      (r'^instagram/auth/$', 'instagramTest.instagram.views.validateUser'),
      # url(r'^instagram/auth/$', RedirectView.as_view(url='/instagram/'), name='instagram'),
      url(r'^instagram/(?P<userID>\d+)/$', 'instagramTest.instagram.views.instagram',name="userPage"),
+     url(r'^instagram/(?P<userID>\d+)/(?P<maxId>\S+)/$', 'instagramTest.instagram.views.instagramNext',name="userImagePages"),
 )
+
+urlpatterns += patterns('django.contrib.staticfiles.views',
+        url(r'^static/(?P<path>.*)$', 'serve'),
+    )

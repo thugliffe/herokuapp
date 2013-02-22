@@ -1,22 +1,113 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+
 <title>Welcome {{user.username}}</title>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+<!-- Add jQuery library -->
+<script type="text/javascript"
+	src="{{ STATIC_URL }}js/jquery-1.9.0.min.js"></script>
+
+
+<!-- Add fancyBox main JS and CSS files -->
+<script type="text/javascript"
+	src="{{ STATIC_URL }}js/jquery.fancybox.js?v=2.1.4"></script>
+<link rel="stylesheet" type="text/css"
+	href="{{ STATIC_URL }}css/jquery.fancybox.css?v=2.1.4" media="screen" />
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.fancybox').fancybox();
+	});
+</script>
 <style>
 body {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
 }
+
+#userProfile {
+	float: left;
+}
+
+#photoContainer {
+	float: left;
+	width:85%;
+	background-color:#EEFFEE
+}
+
+#photoContainer ul {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+#photoContainer ul li {
+	float: left;
+	padding: 15px 15px;
+}
+
+#photoContainer ul li .content {
+	padding: 10px 10px;
+	background-color: #EFEFEF;
+}
+
+#photoContainer ul li .content {
+	-webkit-transform: scale(1);
+	/*Webkit 0.8 times the original Image size*/
+	-moz-transform: scale(1);
+	/*Mozilla 0.8 times the original Image size*/
+	-o-transform: scale(1); /*Opera 0.8 times the original Image size*/
+	-webkit-transition-duration: 0.6s; /*Webkit: Animation duration*/
+	-moz-transition-duration: 0.3s; /*Mozilla Animation duration*/
+	-o-transition-duration: 0.6s; /*Opera Animation duration*/
+	opacity: 0.7;
+	margin: 0 8px 4px 0;
+}
+
+#photoContainer ul li .content:hover {
+	-webkit-transform: scale(1.1);
+	/*Webkit: 0.6 times the original Image size*/
+	-moz-transform: scale(1.1);
+	/*Mozilla 0.6 times the original Image size*/
+	-o-transform: scale(1.1); /*Opera 0.6 times the original Image size*/
+	box-shadow: 0px 0px 20px gray;
+	-webkit-box-shadow: 0px 0px 20px gray;
+	-moz-box-shadow: 0px 0px 20px gray;
+	opacity: 1;
+	cursor: pointer;
+}
 </style>
 </head>
+
 <body>
-	<h1>{{user.username}}</h1>
-	<img src="{{ user.profile_picture }}" alt="{{ full_name }}" /> 
-	{% for item in media %}
-		
-	<img src="{{ item.images.thumbnail.url }}"/>
-	No. Of Likes : {{ item.likes.count}}
-	{% endfor %}
+	<div id="userProfile">
+		<h3>Welcome {{user.full_name}}</h3>
+		<img src="{{ user.profile_picture }}" alt="{{ full_name }}"
+			width="75px" />
+	</div>
+	<div id="photoContainer">
+		<ul class="photoUL">
+			{% for item in media %}
+			<li>
+				<div class="content">
+					<a class="fancybox"
+						href="{{ item.images.standard_resolution.url }}"
+						title="{{ item.caption.text }}"> <img
+						src="{{ item.images.thumbnail.url }}" /> </a><br /> <span id="likes"><img
+						src="{{ STATIC_URL }}img/fav.png"></img> {{item.likes.count}} <img
+						src="{{ STATIC_URL }}img/comment.png"></img>
+						{{item.comments.count}}</span>
+				</div></li> {% if forloop.counter|divisibleby:"5" and not forloop.last %}
+		</ul>
+		<ul>{% endif %} {% endfor %}
+		</ul>
+	</div>
+	
+	{% if not pagination.next_max_id %}
+		 <a href="{{ request.META.HTTP_REFERER }}">Back</a>
+	{% endif %} {% if pagination.next_max_id %}
+	 	<a href="{% url userImagePages user.id pagination.next_max_id %}">Next</a>
+	{% endif %}
 </body>
 </html>
