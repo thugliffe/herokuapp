@@ -55,7 +55,7 @@ def validateUser(request):
 
 def instagram(request, userID):
     context = dict()
-    user_r = requests.get('{0}users/{1}/?access_token={2}&max_id=3'.format(
+    user_r = requests.get('{0}users/{1}/?access_token={2}'.format(
         settings.INSTAGRAM_API_URL,
         userID,
         request.session['accessToken']))
