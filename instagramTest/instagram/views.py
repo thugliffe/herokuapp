@@ -36,6 +36,8 @@ def validateUser(request):
         error = data.get('error_message', None)
 
         if not error:
+            print 'user successfully verified'
+            print data['access_token']
             context['token'] = data['access_token']
             context['user_id'] = data['user'].get('id', None)
             context['user_name'] = data['user'].get('full_name', None)
@@ -52,7 +54,6 @@ def validateUser(request):
 
 
 def instagram(request, userID):
-    print request.session.session_key
     context = dict()
     user_r = requests.get('{0}users/{1}/?access_token={2}&max_id=3'.format(
         settings.INSTAGRAM_API_URL,
