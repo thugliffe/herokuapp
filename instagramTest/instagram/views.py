@@ -42,11 +42,11 @@ def validateUser(request):
             context['user_id'] = data['user'].get('id', None)
             context['user_name'] = data['user'].get('full_name', None)
             request.session['accessToken'] = data['access_token']
-    
+            return HttpResponseRedirect(reverse('userPage', args=(data['user'].get('id', None),)))
     
 
     # return render_to_response('instagram.html', context)  # Create your views here.
-    return HttpResponseRedirect(reverse('userPage', args=(data['user'].get('id', None),)))
+    return HttpResponseRedirect(reverse('loginpage',))
     # return redirect('instagram', context)
 
 
@@ -55,50 +55,79 @@ def validateUser(request):
 
 def instagram(request, userID):
     context = dict()
-    user_r = requests.get('{0}users/{1}/?access_token={2}'.format(
-        settings.INSTAGRAM_API_URL,
-        userID,
-        request.session['accessToken']))
-    user_data = json.loads(user_r.text)
-
-    media_r = requests.get('{0}users/{1}/media/recent/?access_token={2}'.format(
-        settings.INSTAGRAM_API_URL,
-        userID,
-        request.session['accessToken']))
-    media_data = json.loads(media_r.text)
-    print media_data
-    context = {
-        'user': user_data.get('data', None),
-        'media': media_data.get('data', None),
-        'pagination': media_data.get('pagination', None),
-    
-    }
-    return render_to_response('instagram.html', context, context_instance=RequestContext(request))
+    if 'accessToken' in request.session:
+        user_r = requests.get('{0}users/{1}/?access_token={2}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            request.session['accessToken']))
+        user_follows = requests.get('{0}users/{1}/follows?access_token={2}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            request.session['accessToken']))
+        user_followedby = requests.get('{0}users/{1}/followed-by?access_token={2}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            request.session['accessToken']))
+        user_data = json.loads(user_r.text)
+        user_follows_data = json.loads(user_follows.text)
+        user_followedby_data = json.loads(user_followedby.text)
+        print request.session['accessToken']
+     
+        media_r = requests.get('{0}users/{1}/media/recent/?access_token={2}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            request.session['accessToken']))
+        media_data = json.loads(media_r.text)
+        print user_follows_data
+        print user_follows_data.get('data',None)
+        context = {
+            'user': user_data.get('data', None),
+            'media': media_data.get('data', None),
+            'pagination': media_data.get('pagination', None),
+            'follows':len(user_follows_data.get('data')),
+            'followedBy':len(user_followedby_data.get('data')),
+            'firstPage':True,
+        
+        }
+        return render_to_response('instagram.html', context, context_instance=RequestContext(request))
+    return HttpResponseRedirect(reverse('loginpage',))
 
 def instagramNext(request, userID, maxId):
     session = SessionStore(session_key=request.session.session_key)
-    accessToken= session['accessToken']
-    print accessToken
-    context = dict()
-    user_r = requests.get('{0}users/{1}/?access_token={2}'.format(
-        settings.INSTAGRAM_API_URL,
-        userID,
-        accessToken))
-    user_data = json.loads(user_r.text)
-    print 'user data loaded'
-
-    media_r = requests.get('{0}users/{1}/media/recent/?access_token={2}&max_id={3}'.format(
-        settings.INSTAGRAM_API_URL,
-        userID,
-        accessToken,
-        maxId))
-    media_data = json.loads(media_r.text)
-    print 'media data loaded'
-    context = {
-        'user': user_data.get('data', None),
-        'media': media_data.get('data', None),
-        'pagination': media_data.get('pagination', None),
-    
-    }
-    return render_to_response('instagram.html', context, context_instance=RequestContext(request))
+    if 'accessToken' in session:
+        accessToken= session['accessToken']
+        print accessToken
+        context = dict()
+        user_r = requests.get('{0}users/{1}/?access_token={2}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            accessToken))
+        user_data = json.loads(user_r.text)
+        user_follows = requests.get('{0}users/{1}/follows?access_token={2}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            accessToken))
+        user_followedby = requests.get('{0}users/{1}/followed-by?access_token={2}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            accessToken))
+        user_follows_data = json.loads(user_follows.text)
+        user_followedby_data = json.loads(user_followedby.text)
+        media_r = requests.get('{0}users/{1}/media/recent/?access_token={2}&max_id={3}'.format(
+            settings.INSTAGRAM_API_URL,
+            userID,
+            accessToken,
+            maxId))
+        media_data = json.loads(media_r.text)
+        context = {
+            'user': user_data.get('data', None),
+            'media': media_data.get('data', None),
+            'pagination': media_data.get('pagination', None),
+            'follows':len(user_follows_data.get('data')),
+            'followedBy':len(user_followedby_data.get('data')),
+            'firstPage':False,
+        
+        }
+        return render_to_response('instagram.html', context, context_instance=RequestContext(request))
+    return HttpResponseRedirect(reverse('loginpage',))
 

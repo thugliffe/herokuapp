@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-     (r'^$', 'instagramTest.instagram.views.login_user'),
+     url(r'^$', 'instagramTest.instagram.views.login_user',name='loginpage'),
      (r'^instagram/auth/$', 'instagramTest.instagram.views.validateUser'),
      # url(r'^instagram/auth/$', RedirectView.as_view(url='/instagram/'), name='instagram'),
      url(r'^instagram/(?P<userID>\d+)/$', 'instagramTest.instagram.views.instagram',name="userPage"),
